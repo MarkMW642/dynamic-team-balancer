@@ -1,0 +1,153 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cast Your Votes</title>
+    <link rel="stylesheet" href="{% static 'styles.css' %}">
+</head>
+<body>
+
+    <div class="card">
+        <h1>Cast Your Votes</h1>
+        <p class="page-subtitle-select">Rate Your Teammates After Today's Match.</p>
+
+        <form method="POST" action="{% url 'submit_votes' token %}">
+            {% csrf_token %}
+
+            <!-- Players select themselves first -->
+            <div class="step">
+                <strong>Step 1 — Who Are You?</strong>
+                Select yourself from the players below.
+            </div>
+
+            <div class="player-grid" id="player-grid">
+                {% for player in players %}
+                    <button
+                        type="button"
+                        class="player-select-btn"
+                        onclick="selectSelf({{ player.id }}, this)"
+                    >
+                        {{ player.name }}
+                    </button>
+                {% endfor %}
+            </div>
+
+            <!-- Hidden input that stores which player they are -->
+            <input type="hidden" name="voter_id" id="voter-id" value="">
+
+            <!-- Section for where the voting options will be displayed once player chooses themselves -->
+            <div id="voting-section">
+                <hr class="section-divider">
+                <div class="step">
+                    <strong>Step 2 — Rate your teammates</strong>
+                    Assign one vote type to each player. You don't have to vote for everyone.
+                </div>
+
+    <table class="vote-table">
+    <thead>
+        <tr>
+            <th>Vote Category</th>
+            <th>What It Means</th>
+            <th>Award to</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><strong>Man of the Match</strong></td>
+            <td style="font-size:12px; color:#888;">Best Overall Performance</td>
+            <td>
+                <select name="vote_motm">
+                    <option value="">— No vote —</option>
+                    {% for player in players %}
+                        <option value="{{ player.id }}">{{ player.name }}</option>
+                        {% endfor %}
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td><strong> Workhorse</strong></td>
+            <td style="font-size:12px; color:#888;">Best Running Performance</td>
+            <td>
+                <select name="vote_workhorse">
+                    <option value="">— No vote —</option>
+                    {% for player in players %}
+                        <option value="{{ player.id }}">{{ player.name }}</option>
+                    {% endfor %}
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td><strong>Brick Wall</strong></td>
+            <td style="font-size:12px; color:#888;">Best Defensive Performance</td>
+            <td>
+                <select name="vote_defensive_wall">
+                    <option value="">— No vote —</option>
+                    {% for player in players %}
+                        <option value="{{ player.id }}">{{ player.name }}</option>
+                    {% endfor %}
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td><strong>Playmaker</strong></td>
+            <td style="font-size:12px; color:#888;">Best Creative Performance</td>
+            <td>
+                <select name="vote_playmaker">
+                    <option value="">— No vote —</option>
+                    {% for player in players %}
+                        <option value="{{ player.id }}">{{ player.name }}</option>
+                    {% endfor %}
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td><strong>Finisher</strong></td>
+            <td style="font-size:12px; color:#888;">Best Finishing Performance</td>
+            <td>
+                <select name="vote_finisher">
+                    <option value="">— No vote —</option>
+                    {% for player in players %}
+                        <option value="{{ player.id }}">{{ player.name }}</option>
+                    {% endfor %}
+                </select>
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+    <button type="submit" class="btn-primary">Submit votes</button>
+
+
+
+    <!-- JavaScript to handle player selection and dynamic vote option filtering -->
+    <script>
+        var selectedId = null;
+
+        function selectSelf(playerId, btn) {
+        document.querySelectorAll('.player-select-btn').forEach(function(b) {
+        b.classList.remove('selected');
+    });
+
+    btn.classList.add('selected');
+    document.getElementById('voter-id').value = playerId;
+
+    // Remove the voter from all vote dropdowns
+    document.querySelectorAll('.vote-table select').forEach(function(select) {
+        Array.from(select.options).forEach(function(option) {
+            if (option.value == playerId) {
+                option.style.display = 'none';
+            } else {
+                option.style.display = '';
+            }
+        });
+    });
+
+    document.getElementById('voting-section').style.display = 'block';
+}
+
+</script>
+
+</body>
+</html>

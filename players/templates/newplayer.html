@@ -1,0 +1,89 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Player</title>
+    <link rel="stylesheet" href="{% static 'styles.css' %}">
+</head>
+<body>
+
+
+    <div class="card">
+        <h1 class="h1-card">Add New Player</h1>
+        <p class="page-subtitle">Fill in The Details Below. All Fields are Required.</p>
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="{% if message.tags == 'error' %}msg-error{% else %}msg-success{% endif %}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <form method="POST">
+            {% csrf_token %}
+
+            {% for field in form %}
+                {% if field.name in 'name,age,position' %}
+                    <div>
+                        <label for="{{ field.id_for_label }}">
+                            {{ field.label }}
+                        </label>
+                        {{ field }}
+                        {% if field.errors %}
+                            <ul class="errorlist">
+                                {% for error in field.errors %}
+                                    <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
+                    </div>
+                {% endif %}
+            {% endfor %}
+
+            <hr class="section-divider">
+            <p class="section-title">Attributes</p>
+            <p class="section-sub">Drag Each Slider To Rate This Player — 1 = Poor, 10 = Excellent</p>
+
+            {% for field in form %}
+                {% if field.name in 'shooting,passing,defending,stamina,work_rate,pace,strength,skills,technical_ability' %}
+                    <div class="slider-row">
+                        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                        {{ field }}
+                        <span class="slider-value" id="val_{{ field.name }}">{{ field.value }}</span>
+                    </div>
+                {% endif %}
+            {% endfor %}
+
+            <hr class="section-divider">
+            <p class="section-sub">Match Winner: How Often Does This Player Change a Game? (1 = Rarely, 5 = Game Changer)</p>
+
+            {% for field in form %}
+                {% if field.name == 'match_winner' %}
+                    <div class="slider-row">
+                        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                        {{ field }}
+                        <span class="slider-value" id="val_{{ field.name }}">{{ field.value }}</span>
+                    </div>
+                {% endif %}
+            {% endfor %}
+
+            <button type="submit" class="btn-primary">Add player</button>
+        </form>
+
+        <a href="{% url 'dashboard' %}" class="btn-secondary">Back to dashboard</a>
+    </div>
+
+    <script>
+        document.querySelectorAll('input[type="range"]').forEach(function(slider) {
+            slider.addEventListener('input', function() {
+                var display = document.getElementById('val_' + this.name);
+                if (display) display.textContent = this.value;
+            });
+        });
+    </script>
+
+</body>
+</html>

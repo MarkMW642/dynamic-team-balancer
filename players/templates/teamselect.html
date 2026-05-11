@@ -1,0 +1,114 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Select Players</title>
+    <link rel="stylesheet" href="{% static 'styles.css' %}">
+</head>
+<body>
+
+
+    <div class="card card-wide">
+        <h1>Please Select Availaible Players</h1>
+        <p class="page-subtitle">Tick every player that is available. Then click Generate teams.</p>
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="msg-error">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+
+        {% if players %}
+            <form method="POST" action="{% url 'generatedteams' %}">
+                {% csrf_token %}
+                <div class="table-wrapper">
+                <table class="players-table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Position</th>
+                            <th>Age</th>
+                            <th>Overall</th>
+                            <th>Check Availability</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for player in players %}
+                            <tr id="row-{{ player.id }}" onclick="toggleRow({{ player.id }})">
+                
+                                <td>{{ player.name }}</td>
+                                <td>{{ player.position }}</td>
+                                <td>{{ player.age }}</td>
+                                <td><span class="overall-badge">{{ player.overall }}</span></td>
+                                <td>
+                                    <input
+                                        type="checkbox"
+                                        name="selected_players"
+                                        value="{{ player.id }}"
+                                        id="cb-{{ player.id }}"
+                                        onclick="event.stopPropagation()"
+                                        onchange="updateCount()"
+                                    >
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                </div>
+                <div id="odd-notice" class="odd-notice">
+                    Odd Number of Players Selected
+                </div>
+                <p class="page-subtitle-select" id="selected-count">0 Players Selected</p>
+                <br>
+                <div class="table-actions">
+                    <br>
+                    <button type="submit" class="btn-primary" id="generate-btn">
+                        Generate Teams
+                    </button>
+                </div>
+            </form>
+
+        {% else %}
+            <p>
+                No Players In Your Squad Yet.
+            </p>
+        {% endif %}
+
+        <a href="{% url 'dashboard' %}" class="btn-secondary">Back to dashboard</a>
+    </div>
+
+    <script>
+        function toggleRow(playerId) {
+            var checkbox = document.getElementById('cb-' + playerId);
+            checkbox.checked = !checkbox.checked;
+            updateCount();
+        }
+
+        function updateCount() {
+            var checkboxes = document.querySelectorAll('input[name="selected_players"]');
+            var count = 0;
+            checkboxes.forEach(function(cb) {
+                var row = document.getElementById('row-' + cb.value);
+                if (cb.checked) {
+                    count++;
+                    row.classList.add('selected');
+                } else {
+                    row.classList.remove('selected');
+                }
+            });
+
+            document.getElementById('selected-count').textContent =
+                count + ' Player' + (count !== 1 ? 's' : '') + ' Selected';
+
+            document.getElementById('generate-btn').disabled = count < 2;
+
+            // Show odd number warning
+            var notice = document.getElementById('odd-notice');
+            notice.style.display = (count > 0 && count % 2 !== 0) ? 'block' : 'none';
+        }
+    </script>
+
+</body>
+</html>

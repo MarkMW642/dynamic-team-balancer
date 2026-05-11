@@ -1,0 +1,52 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="{% static 'styles.css' %}">
+</head>
+<body>
+
+<nav class="navbar">
+    <p>Welcome {{ user.username }}</p>
+    <a href="{% url 'logout' %}" >Log out</a>
+</nav>
+
+
+<!-- Main dashboard - Three Sections - Add Player, View Players, Generate Teams -->
+    <h1>Dynamic Team Balancing System</h1>
+    <div class="card"> 
+        <h2 class="h2card">Add New Player</h2>
+        <button class="btn-primary" type="button" onclick="window.location.href='{% url 'newplayer' %}'">Add Player</button>
+        <br>
+        <h2 class="h2card">View Players</h2>
+        <button class = "btn-primary" type="button" onclick="window.location.href='{% url 'viewplayers' %}'">View Players</button>
+        <br>
+        <h2 class="h2card">Generate Teams</h2>
+        <button class = "btn-primary" type="button" onclick="window.location.href='{% url 'teamselect' %}'">Generate Teams</button>
+    </div>
+    
+
+{% if open_matches %}
+    <div class="msg-error" style="margin: 20px;">
+        You have open voting sessions that haven't been closed yet.
+    </div>
+    {% for match in open_matches %}
+        <div class = "card">
+            <p class="page-subtitle">
+                Match from {{ match.created_at|date:"d M Y" }} — voting still open
+            </p>
+            <a href="{% url 'closevoting' match.share_token %}" 
+               style="font-size:13px; color:#c00; font-weight:bold; text-align:center;">
+                Close voting &amp; update ratings →
+            </a>
+        </div>
+    {% endfor %}
+{% endif %}
+
+
+
+
+    

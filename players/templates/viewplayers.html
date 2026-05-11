@@ -1,0 +1,147 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Players</title>
+    <link rel="stylesheet" href="{% static 'styles.css' %}">
+    
+</head>
+<body>
+
+
+    <div class="card card-wide">
+        <h1>List of Players</h1>
+        
+        {% if messages %}
+            {% for message in messages %}
+                <div class="{% if message.tags == 'error' %}msg-error{% else %}msg-success{% endif %}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        {% if players %}
+            <form method="POST" action="{% url 'deleteplayer' %}" id="players-form">
+                {% csrf_token %}
+                <div class="table-wrapper">
+                <table class="players-table">
+                    <thead>
+                        <tr>
+                            
+                            <th>Name</th>
+                            <th>Age</th>
+                            <th>Position</th>
+                            <th>Shooting</th>
+                            <th>Passing</th>
+                            <th>Defending</th>
+                            <th>Stamina</th>
+                            <th>Work rate</th>
+                            <th>Pace</th>
+                            <th>Strength</th>
+                            <th>Skills</th>
+                            <th>Technical</th>
+                            <th>Match winner</th>
+                            <th>Overall</th>
+                            <th style="width:36px;">Selected Player</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for player in players %}
+                            <tr id="row-{{ player.id }}" onclick="toggleRow({{ player.id }})">
+                                
+                                <td>{{ player.name }}</td>
+                                <td>{{ player.age }}</td>
+                                <td>{{ player.position }}</td>
+                                <td>{{ player.shooting|floatformat:"1" }}</td>
+                                <td>{{ player.passing|floatformat:"1" }}</td>
+                                <td>{{ player.defending|floatformat:"1" }}</td>
+                                <td>{{ player.stamina|floatformat:"1" }}</td>
+                                <td>{{ player.work_rate|floatformat:"1" }}</td>
+                                <td>{{ player.pace|floatformat:"1" }}</td>
+                                <td>{{ player.strength|floatformat:"1" }}</td>
+                                <td>{{ player.skills|floatformat:"1" }}</td>
+                                <td>{{ player.technical_ability|floatformat:"1" }}</td>
+                                <td>{{ player.match_winner }}/5</td>
+                                <td>
+                                    <span class="overall-badge">{{ player.overall }}</span>
+                                </td>
+                                 <td>
+                                    <input
+                                        type="checkbox"
+                                        name="selected_players"
+                                        value="{{ player.id }}"
+                                        id="cb-{{ player.id }}"
+                                        onclick="event.stopPropagation()"
+                                        onchange="updateCount()"
+                                    >
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                </div>
+
+                <div class="table-actions">
+                    <span id="selected-count">0 players selected</span>
+                    <button
+                        type="submit"
+                        class="btn-delete"
+                        id="delete-btn"
+                        disabled
+                        onclick="return confirmDelete()"
+                    >
+                        Delete selected
+                    </button>
+                </div>
+            </form>
+
+        {% else %}
+            <p class="no-players">No players yet. Add your first player to get started.</p>
+        {% endif %}
+
+        <a href="{% url 'newplayer' %}" class="btn-primary" style="margin-top:20px;">Add new player</a>
+        <a href="{% url 'dashboard' %}" class="btn-secondary">Back to dashboard</a>
+    </div>
+
+    <script>
+        // Click anywhere on a row to tick/untick it
+        function toggleRow(playerId) {
+            var checkbox = document.getElementById('cb-' + playerId);
+            var row = document.getElementById('row-' + playerId);
+            checkbox.checked = !checkbox.checked;
+            row.classList.toggle('selected', checkbox.checked);
+            updateCount();
+        }
+
+        // Keep the selected count and delete button in sync
+        function updateCount() {
+            var checkboxes = document.querySelectorAll('input[name="selected_players"]');
+            var count = 0;
+            checkboxes.forEach(function(cb) {
+                var row = document.getElementById('row-' + cb.value);
+                if (cb.checked) {
+                    count++;
+                    row.classList.add('selected');
+                } else {
+                    row.classList.remove('selected');
+                }
+            });
+
+            document.getElementById('selected-count').textContent =
+                count + ' player' + (count !== 1 ? 's' : '') + ' selected';
+
+            var deleteBtn = document.getElementById('delete-btn');
+            deleteBtn.disabled = count === 0;
+        }
+
+        // Ask the user to confirm before deleting
+        function confirmDelete() {
+            var count = document.querySelectorAll('input[name="selected_players"]:checked').length;
+            return confirm('Are you sure you want to delete ' + count + ' player(s)? This cannot be undone.');
+        }
+    </script>
+
+</body>
+</html>

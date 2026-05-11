@@ -1,0 +1,38 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Close Voting</title>
+    <link rel="stylesheet" href="{% static 'styles.css' %}">
+</head>
+<body>
+
+    <div class="card">
+
+        <h1>Close Voting?</h1>
+        <p class="page-subtitle">
+            This will tally all votes, update player ratings and lock this session.
+            This cannot be undone.
+        </p>
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="msg-error">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+
+        <form method="POST">
+            {% csrf_token %}
+            <button type="submit" class="btn-primary" style="background:#c00;">
+                Yes, Close Voting &amp; Update Ratings
+            </button>
+        </form>
+
+        <a href="{% url 'savematch' %}" class="btn-secondary">Cancel</a>
+
+    </div>
+
+</body>
+</html>

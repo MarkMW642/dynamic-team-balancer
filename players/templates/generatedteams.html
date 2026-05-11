@@ -1,0 +1,75 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teams</title>
+    <link rel="stylesheet" href="{% static 'styles.css' %}">
+</head>
+<body>
+
+    <div class="card card-wide">
+        <h1>Today's Teams</h1>
+        <p class="page-subtitle">
+            {{ team_a|length }} v {{ team_b|length }}
+            &nbsp;·&nbsp;
+            Teams Are Balanced By Ratings & Positions
+        </p>
+
+        <div class="teams-grid">
+
+            <!-- TEAM A -->
+            <div class="team-card">
+                <h2>Team A</h2>
+                    {% for player in team_a %}
+                    <div class="player-row">
+                        <div>
+                            <div class="player-name">{{ player.name }}</div>
+                            <div class="player-meta">{{ player.position }} · Age {{ player.age }}</div>
+                        </div>
+                        <span class="overall-badge">{{ player.overall }}</span>
+                    </div>
+                {% endfor %}
+              <p class="team-total">Total rating: <span class="overall-badge-total">{{ team_a_total }}</span></p>
+
+            </div>
+
+            <!-- TEAM B -->
+            <div class="team-card">
+                <h2>Team B</h2>
+                {% for player in team_b %}
+                    <div class="player-row">
+                        <div>
+                            <div class="player-name">{{ player.name }}</div>
+                            <div class="player-meta">{{ player.position }} · Age {{ player.age }}</div>
+                        </div>
+                        <span class="overall-badge">{{ player.overall }}</span>
+                    </div>
+                    
+                {% endfor %}
+                <p class="team-total">Total rating: <span class="overall-badge-total">{{ team_b_total }}</span></p>
+
+                </div>
+
+        </div>
+        <form method="POST" action="{% url 'savematch' %}">
+    {% csrf_token %}
+    {% for player in team_a %}
+        <input type="hidden" name="player_ids" value="{{ player.id }}">
+    {% endfor %}
+    {% for player in team_b %}
+        <input type="hidden" name="player_ids" value="{{ player.id }}">
+    {% endfor %}
+    <button type="submit" class="btn-primary">
+        Create Vote Session
+    </button>
+</form>
+        <a href="{% url 'teamselect' %}" class="btn-secondary">
+            Back to Player Select
+        </a>
+        <a href="{% url 'dashboard' %}" class="btn-secondary">Back to dashboard</a>
+    </div>
+
+</body>
+</html>

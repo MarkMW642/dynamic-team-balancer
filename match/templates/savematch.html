@@ -1,0 +1,62 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vote Session Created</title>
+    <link rel="stylesheet" href="{% static 'styles.css' %}">
+</head>
+<body>
+
+    <div class="card card-wide">
+
+        <h1>Voting Session Created</h1>
+        <p class="page-subtitle" style="font-weight:bold; font-size:16px;">
+            Share The Link Below With Your Players So They Can Cast Their Votes.
+        </p>
+
+        <div class="share-box">
+            <p>Share This Link With Your Players</p>
+            <span class="share-url" id="share-url">{{ share_url }}</span>
+            <button class="btn-copy" onclick="copyLink()">Copy link</button>
+            <p class="copied-msg" id="copied-msg">✓ Copied to clipboard!</p>
+        </div>
+
+        <p class="page-subtitle" style="font-weight:bold;">
+            Players In This Match ({{ players|length }})
+        </p>
+
+        <div style="text-align:center; margin-bottom:20px;">
+            {% for player in players %}
+                <span class="player-chip">{{ player.name }}</span>
+            {% endfor %}
+        </div>
+
+        <div class="close-section">
+            <p style="text-align:center">
+                When you're ready to close voting and update player ratings,
+                use the button below. Only do this once everyone has voted.
+            </p>
+            <a href="{% url 'closevoting' match.share_token %}" class="btn-close-voting">
+                Close Voting
+            </a>
+            <a href="{% url 'dashboard' %}" class="btn-secondary">Back to dashboard</a>
+        </div>
+
+    </div>  <!-- closes card -->
+
+    <script>
+        function copyLink() {
+            var url = document.getElementById('share-url').textContent.trim();
+            navigator.clipboard.writeText(url).then(function() {
+                document.getElementById('copied-msg').style.display = 'block';
+                setTimeout(function() {
+                    document.getElementById('copied-msg').style.display = 'none';
+                }, 3000);
+            });
+        }
+    </script>
+
+</body>
+</html>
