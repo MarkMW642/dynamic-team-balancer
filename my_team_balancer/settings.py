@@ -121,7 +121,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = '/static/'
-STATIC_ROOT = '/home/MarkMW642/my_team_balancer/static'
+STATIC_ROOT = '/home/MarkMW642/dynamic-team-balancerr/static'
 STATICFILES_DIRS = [BASE_DIR / 'static']
 
 
